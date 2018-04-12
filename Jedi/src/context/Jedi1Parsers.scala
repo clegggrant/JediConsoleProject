@@ -1,4 +1,4 @@
-/*package context
+package context
 
 import scala.util.parsing.combinator._
 import expression._
@@ -32,10 +32,22 @@ class Jedi1Parsers extends RegexParsers {
    }
    
    // conjunction ::= equality ~ ("&&" ~ equality)*
+   def conjunction: Parser[Expression] = equality ~ rep("&&" ~> equality) ^^ {
+     case con ~ Nil => con
+     case con ~ more => Conjunction(con::more)
+   }
    
    // equality ::= inequality ~ ("==" ~ inequality)*
+   def equality: Parser[Expression] = inequality ~ rep("==" ~> inequality) ^^ {
+     case con ~ Nil => con
+     case con ~ more => null
+   }
    
    // inequality ::= sum ~ (("<" | ">" | "!=") ~ sum)?
+   def inequality: Parser[Expression] = sum ~ opt(("<" | ">" | "!=") ~ sum) ^^ {
+     case con ~ Nil => con
+     case con ~ more => null
+   }
    
    // 
 
@@ -92,4 +104,4 @@ class Jedi1Parsers extends RegexParsers {
  
  // operands ::= "(" ~ (expression ~ ("," ~ expression)*)? ~ ")"
   
-}*/
+}

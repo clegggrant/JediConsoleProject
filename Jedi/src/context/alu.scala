@@ -152,15 +152,7 @@ object alu {
     val args2 = args.map(toBoole).filter(_ != None)
     if(args2.size == args.size) !args2(0).get
     else {
-      val args3 = args.map(toInt).filter(_ != None)
-      if(args3.size == args.size) -args3(0).get
-      else {
-        val args4 = args.map(toReal).filter(_ != None)
-        if(args4.size == args.size) -args4(0).get
-        else {
-          throw new TypeException("not expects number or boole")
-        }
-      }
+     throw new TypeException("not expects number or boole")
     }
   }
  

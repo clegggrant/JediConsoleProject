@@ -12,4 +12,9 @@ object FunCallTest extends App{
   println(exp.execute(globalEnvironment))
   exp = FunCall(Identifier("mul"), operands)
   println(exp.execute(globalEnvironment))
+  val operands2 = List(Integer(42), Integer(7))
+  exp = FunCall(Identifier("less"), operands)
+  println(exp.execute(globalEnvironment))
+  exp = FunCall(Identifier("div"), operands2)
+  println(exp.execute(globalEnvironment))
 }
