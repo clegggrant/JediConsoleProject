@@ -22,8 +22,8 @@ object alu {
       case "less" => less(args) //binary
       case "more" => more(args) // binary
       case "equals" => equals(args) // note: equals(7, true) = false, not error
-      //case "unequals" => unequals(args) // binary, = not(equals(args))?
-      //case "not" => not(args) // unary
+      case "unequals" => unequals(args) // binary, = not(equals(args))?
+      case "not" => not(args) // unary
       // primitive I/O ops:
       case "write" => write(args)
       case "prompt" => prompt(args)
@@ -42,6 +42,9 @@ object alu {
       
     private def toChars(arg: Value): Option[Chars] =
       if (arg.isInstanceOf[Chars]) Some(arg.asInstanceOf[Chars]) else None
+      
+    private def toBoole(arg: Value): Option[Boole] =
+      if(arg.isInstanceOf[Boole]) Some(arg.asInstanceOf[Boole]) else None
       
     private def add(args: List[Value]) = {
       val args2 = args.map(toInt).filter(_ != None)
@@ -95,7 +98,7 @@ object alu {
       }
     }
     
-  def less(args: List[Value]): Value = {
+  private def less(args: List[Value]): Value = {
       if (args.length  != 2) throw new TypeException("less expects two inputs")
       val args2 = args.map(toInt).filter(_ != None)
       if (args2.size == args.size) Boole(args2(0) < args2(1))
@@ -110,7 +113,7 @@ object alu {
       }
    }
   
-  def more(args: List[Value]) = {
+  private def more(args: List[Value]) = {
     if(args.length != 2) throw new TypeException("more expects two inputs")
     val args2 = args.map(toInt).filter(_ != None)
     if( args2.size == args.size) Boole(args2(0) > args2(1))
@@ -123,7 +126,7 @@ object alu {
     }
   }
   
-  def equals(args: List[Value]) = {
+  private def equals(args: List[Value]) = {
     if(args.length != 2) throw new TypeException("equals expects two inputs")
     val args2 = args.map(toInt).filter(_ != None)
     if(args2.size == args.size) Boole(args2(0) == args2(1))
@@ -140,6 +143,26 @@ object alu {
     }
   }
   
+ private  def unequals(args: List[Value]) = {
+    not(List(equals(args)))
+  }
+  
+ private def not(args: List[Value]) = {
+    if(args.length != 1) throw new TypeException("not expects only 1 argument")
+    val args2 = args.map(toBoole).filter(_ != None)
+    if(args2.size == args.size) !args2(0).get
+    else {
+      val args3 = args.map(toInt).filter(_ != None)
+      if(args3.size == args.size) -args3(0).get
+      else {
+        val args4 = args.map(toReal).filter(_ != None)
+        if(args4.size == args.size) -args4(0).get
+        else {
+          throw new TypeException("not expects number or boole")
+        }
+      }
+    }
+  }
  
    def write(vals: List[Value]): Value = { println(vals(0)); Notification.DONE }
    def read(vals: List[Value]): Value = { val result = io.StdIn.readDouble(); Real(result)}
