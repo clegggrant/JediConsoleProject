@@ -40,13 +40,21 @@ class Jedi1Parsers extends RegexParsers {
    // equality ::= inequality ~ ("==" ~ inequality)*
    def equality: Parser[Expression] = inequality ~ rep("==" ~> inequality) ^^ {
      case con ~ Nil => con
-     case con ~ more => null
+     case con ~ more => FunCall(Identifier("equals"), con::more)
    }
    
    // inequality ::= sum ~ (("<" | ">" | "!=") ~ sum)?
    def inequality: Parser[Expression] = sum ~ opt(("<" | ">" | "!=") ~ sum) ^^ {
-     case con ~ Nil => con
-     case con ~ more => null
+     case con ~ None => con
+     case (t ~ blah) => parseInequality(t, blah.get)
+   }
+   
+   private def parseInequality(t: Expression, terms: ~[String, Expression]) = {
+     terms match {
+       case ~("<", t1)=> FunCall(Identifier("less"), List(t, t1))
+       case ~(">", t1)=> FunCall(Identifier("more"), List(t, t1))
+       case ~("!=", t1)=> FunCall(Identifier("unequals"), List(t, t1))
+     }
    }
    
    // 
@@ -93,15 +101,35 @@ class Jedi1Parsers extends RegexParsers {
  }
  
  // integer ::= 0|(\+|-)?[1-9][0-9]*
+ def integer: Parser[Integer] = """0|(\+|-)?[1-9][0-9]*""".r ^^ {
+   case integers => Integer(integers.toInt)
+ }
  
  // real ::= (\+|-)?[0-9]+\.[0-9]+
+ def real: Parser[Real] = """(\+|-)?[0-9]+\.[0-9]+""".r ^^ {
+   case reals => Real(reals.toDouble)
+ }
  
  // boole ::= true | false
+ def boole: Parser[Boole] = """true|false""".r ^^ {
+   case booles => Boole(booles.toBoolean)
+ }
 
  // identifier ::= [a-zA-Z][a-zA-Z0-9]*
- 
+ def identifier : Parser[Identifier] = """[a-zA-Z][a-zA-Z0-9]*""".r ^^ {
+   case identifiers => Identifier(identifiers)
+ }
+
  // funCall ::= identifier ~ operands
+ def funCall: Parser[FunCall] = identifier ~ operands ^^ {
+   case identifiers ~ operandss => FunCall(identifiers, operandss)
+ }
  
  // operands ::= "(" ~ (expression ~ ("," ~ expression)*)? ~ ")"
+ def operands: Parser[List[Expression]] = "(" ~> opt(expression ~ rep("," ~> expression)) <~ ")" ^^ {
+   case None => Nil
+   case Some(con ~ Nil) => List(con)
+   case Some(con ~ more) => con::more
+ }
   
 }

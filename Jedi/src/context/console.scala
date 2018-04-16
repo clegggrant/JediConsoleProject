@@ -1,4 +1,4 @@
-/*package context
+package context
 
 import value._
 import scala.io._
@@ -123,4 +123,4 @@ object console {
             }
        }
    }
-}*/
+}
