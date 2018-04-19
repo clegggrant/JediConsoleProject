@@ -1,9 +1,17 @@
 package value
 import expression._
-case class Chars(val value: String) extends Literal {
-  def <(other: Chars) = this.value < other.value
-  def ==(other: Chars) = this.value.equals(other.value)
-  def substring(x: Integer, y: Integer = Integer(this.value.length())) = Chars(this.value.substring(x.value,y.value))
-  def +(other: Chars) = Chars(this.value + other.value)
-  override def toString = this.value
+case class Chars(val scalaValue: String) extends Literal with Ordered[Chars] {
+   
+  def substring(start: Integer, end: Integer) = Chars(scalaValue.substring(start.value, end.value))
+  def length: Integer = Integer(scalaValue.length)
+  
+  def +(other: Chars): Chars = Chars(this.scalaValue + other.scalaValue)
+  override def toString = scalaValue
+  def compare(other: Chars): Int = this.scalaValue.compare(other.scalaValue)
+  override def equals(other: Any): Boolean = 
+    other match {
+       case other: Chars => (other.isInstanceOf[Chars]) && (other.scalaValue == this.scalaValue)
+       case _ => false
+    }
+  override def hashCode = this.toString.##
 }

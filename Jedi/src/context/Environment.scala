@@ -18,4 +18,5 @@ class Environment(var extension: Environment = null)
     else if (extension != null) extension.apply(name)
     else throw new UndefinedException(name)
   }
+  
 }

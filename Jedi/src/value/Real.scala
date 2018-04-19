@@ -4,7 +4,10 @@ case class Real(val value: Double) extends Literal with Ordered[Real] with Equal
   def +(other: Real) = Real(this.value + other.value)
   def -(other: Real) = Real(this.value - other.value)
   def *(other: Real) = Real(this.value * other.value)
-  def /(other: Real) = Real(this.value / other.value)
+  def /(other: Real) = {
+    if (other.value == 0.0) throw new Exception("Division by 0")
+    Real(this.value / other.value)
+  }
   def unary_- = Real(-this.value)
   override def toString = value.toString
   def compare(other: Real) = if(this.value < other.value) -1 else if(other.value < this.value) 1 else 0

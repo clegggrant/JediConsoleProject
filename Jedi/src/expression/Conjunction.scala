@@ -6,7 +6,6 @@ case class Conjunction(val operands: List[Expression]) extends SpecialForm {
   def execute(env: Environment) = {
     if(operands.size < 2) throw new TypeException("Conjunctions need at least 2 arguments")
     val operands2 = operands.map(_.execute(env)).filter(_.isInstanceOf[Boole])
-    //if(operands2.size != operands.size) throw new TypeException("Conjunctions require boolean expressions")
     def helper(result: Boole, unseen: List[Value]): Boole = {
       if(unseen == Nil) result else if(unseen.head.isInstanceOf[Boole] && !unseen.head.asInstanceOf[Boole].value) helper(Boole(false), Nil) else helper(result, unseen.tail)
     }
