@@ -5,11 +5,17 @@ import value._
 case class Conjunction(val operands: List[Expression]) extends SpecialForm {
   def execute(env: Environment) = {
     if(operands.size < 2) throw new TypeException("Conjunctions need at least 2 arguments")
-    val operands2 = operands.map(_.execute(env)).filter(_.isInstanceOf[Boole])
-    def helper(result: Boole, unseen: List[Value]): Boole = {
-      if(unseen == Nil) result else if(unseen.head.isInstanceOf[Boole] && !unseen.head.asInstanceOf[Boole].value) helper(Boole(false), Nil) else helper(result, unseen.tail)
+   
+    def helper(result: Boole, unseen: List[Expression]): Boole = {
+      if(unseen == Nil) result 
+      else 
+        if(!unseen.head.execute(env).isInstanceOf[Boole])
+          throw new TypeException("Conjunctions require Boolean expressiosn")
+        else
+          if(unseen.head.execute(env).isInstanceOf[Boole] && !unseen.head.execute(env).asInstanceOf[Boole].value) helper(Boole(false), Nil) 
+          else helper(result, unseen.tail)
     }
-    helper(Boole(true), operands2)
+    helper(Boole(true), operands)
   }
 }
 
